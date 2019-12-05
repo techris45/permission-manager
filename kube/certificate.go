@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-func getSignedCertificateForUser(kc *kubernetes.Clientset, username string, privateKey *rsa.PrivateKey) (certificatePemBytes []byte) {
+func getSignedCertificateForUser(kc kubernetes.Interface, username string, privateKey *rsa.PrivateKey) (certificatePemBytes []byte) {
 	_, csrPemByte := createCSR(username, privateKey)
 	certsClients := kc.CertificatesV1beta1()
 	csrObjectName := "CSR_FOR_" + username + time.Now().String()

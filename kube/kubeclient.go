@@ -31,7 +31,7 @@ func newRestConfig() *rest.Config {
 }
 
 // NewKubeclient returns a kubernetes client already configured
-func NewKubeclient() *kubernetes.Clientset {
+func NewKubeclient() kubernetes.Interface {
 	var config *rest.Config
 	if os.Getenv("KUBERNETES_SERVICE_HOST") != "" {
 		c, err := rest.InClusterConfig()

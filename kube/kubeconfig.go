@@ -26,7 +26,7 @@ func init() {
 }
 
 // CreateKubeconfigYAML returns a kubeconfig YAML string
-func CreateKubeconfigYAML(kc *kubernetes.Clientset, username string) (kubeconfigYAML string) {
+func CreateKubeconfigYAML(kc kubernetes.Interface, username string) (kubeconfigYAML string) {
 	priv, privPem := createRsaPrivateKeyPem()
 	certificatePemBytes := getSignedCertificateForUser(kc, username, priv)
 

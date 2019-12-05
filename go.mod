@@ -12,6 +12,7 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/rakyll/statik v0.1.6
+	github.com/stretchr/testify v1.4.0
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/vektra/mockery v0.0.0-20181123154057-e78b021dcbb5 // indirect
 	golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c // indirect

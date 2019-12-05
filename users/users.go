@@ -16,7 +16,7 @@ type User struct {
 
 const resourceUrl = "apis/permissionmanager.user/v1alpha1/permissionmanagerusers"
 
-func GetAll(kc *kubernetes.Clientset) []User {
+func GetAll(kc kubernetes.Interface) []User {
 	users := []User{}
 
 	/* generated from JSON response, most fields not used but usefull as documentation */
@@ -49,7 +49,7 @@ func GetAll(kc *kubernetes.Clientset) []User {
 	}
 
 	var res resType
-	r, err := kc.RESTClient().Get().AbsPath(resourceUrl).DoRaw()
+	r, err := kc.AppsV1().RESTClient().Get().AbsPath(resourceUrl).DoRaw()
 	if err != nil {
 		log.Print("Failed to get users from k8s CRUD api", err)
 	}
@@ -65,7 +65,7 @@ func GetAll(kc *kubernetes.Clientset) []User {
 	return users
 }
 
-func CreateUser(kc *kubernetes.Clientset, username string) User {
+func CreateUser(kc kubernetes.Interface, username string) User {
 	metadataName := "permissionmanager.user." + username
 	jsonPayload := fmt.Sprintf(`{
 		"apiVersion":"permissionmanager.user/v1alpha1",
@@ -78,7 +78,7 @@ func CreateUser(kc *kubernetes.Clientset, username string) User {
 		}
 	}`, metadataName, username)
 
-	_, err := kc.RESTClient().Post().AbsPath(resourceUrl).Body([]byte(jsonPayload)).DoRaw()
+	_, err := kc.AppsV1().RESTClient().Post().AbsPath(resourceUrl).Body([]byte(jsonPayload)).DoRaw()
 	if err != nil {
 		log.Printf("Failed to create user:%s\n %v\n", username, err)
 	}
