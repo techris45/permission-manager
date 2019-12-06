@@ -5,6 +5,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/sighupio/permission-manager/kube"
+	"github.com/sighupio/permission-manager/resources"
 	"github.com/sighupio/permission-manager/users"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,8 +49,9 @@ func ListNamespaces(c echo.Context) error {
 		Namespaces []string `json:"namespaces"`
 	}
 
+	names, _ := resources.GetNamespaces(ac.Kubeclient)
 	return c.JSON(http.StatusOK, Response{
-		Namespaces: kube.GetNamespaces(ac.Kubeclient),
+		Namespaces: names,
 	})
 }
 
