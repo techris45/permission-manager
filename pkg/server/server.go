@@ -50,7 +50,7 @@ func New(kubeclient kubernetes.Interface) *echo.Echo {
 
 	api.GET("/list-users", listUsers)
 	api.GET("/list-groups", listGroups)
-	api.GET("/list-namespace", listNamespaces)
+	api.GET("/list-namespace", ListNamespaces)
 	api.GET("/rbac", ListRbac)
 
 	api.POST("/create-cluster-role", CreateClusterRole)

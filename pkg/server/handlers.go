@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/sighupio/permission-manager/kube"
 	"github.com/sighupio/permission-manager/users"
-	v1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -42,20 +41,15 @@ func listGroups(c echo.Context) error {
 	return c.JSON(http.StatusOK, []Group{})
 }
 
-func listNamespaces(c echo.Context) error {
+func ListNamespaces(c echo.Context) error {
 	ac := c.(*AppContext)
 
-	namespaces, err := ac.Kubeclient.CoreV1().Namespaces().List(metav1.ListOptions{})
-	if err != nil {
-		panic(err.Error())
-	}
-
 	type Response struct {
-		Namespaces []v1.Namespace `json:"namespaces"`
+		Namespaces []string `json:"namespaces"`
 	}
 
 	return c.JSON(http.StatusOK, Response{
-		Namespaces: namespaces.Items,
+		Namespaces: kube.GetNamespaces(ac.Kubeclient),
 	})
 }
 
