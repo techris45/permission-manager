@@ -53,9 +53,9 @@ func New(kubeclient kubernetes.Interface) *echo.Echo {
 	api.GET("/list-namespace", listNamespaces)
 	api.GET("/rbac", ListRbac)
 
-	api.POST("/create-cluster-role", createClusterRole)
+	api.POST("/create-cluster-role", CreateClusterRole)
 	api.POST("/create-user", createUser)
-	api.POST("/create-rolebinding", createRolebinding)
+	api.POST("/create-rolebinding", CreateRolebinding)
 	api.POST("/create-cluster-rolebinding", createClusterRolebinding)
 
 	api.POST("/delete-cluster-role", deleteClusterRole)

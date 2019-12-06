@@ -96,7 +96,7 @@ func ListRbac(c echo.Context) error {
 	})
 }
 
-func createClusterRole(c echo.Context) error {
+func CreateClusterRole(c echo.Context) error {
 	ac := c.(*AppContext)
 	type Request struct {
 		RoleName string              `json:"roleName" validate:"required"`
@@ -124,7 +124,7 @@ func createClusterRole(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{Ok: true})
 }
 
-func createRolebinding(c echo.Context) error {
+func CreateRolebinding(c echo.Context) error {
 	ac := c.(*AppContext)
 	type Request struct {
 		RolebindingName string           `json:"rolebindingName" validate:"required"`
