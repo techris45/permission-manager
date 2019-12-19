@@ -41,7 +41,30 @@ func createUser(us kubernetesresources.UserService) echo.HandlerFunc {
 	}
 }
 
-func ListNamespaces(us kubernetesresources.KubernetesResourcesService) echo.HandlerFunc {
+func deleteUser(us kubernetesresources.UserService) echo.HandlerFunc{
+	return func (c echo.Context) error {
+	
+		type Request struct {
+			Username string `json:"username" validate:"required"`
+		}
+		type Response struct {
+			Ok bool `json:"ok"`
+		}
+	
+		r := new(Request)
+		if err := c.Bind(r); err != nil {
+			return err
+		}
+		if err := c.Validate(r); err != nil {
+			return c.JSON(http.StatusBadRequest, ErrorRes{err.Error()})
+		}
+	
+		us.DeleteUser(r.Username)
+		return c.JSON(http.StatusOK, Response{Ok: true})
+	}
+}
+
+func ListNamespaces(kr kubernetesresources.KubernetesResourcesService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		type Response struct {
 			Namespaces []string `json:"namespaces"`

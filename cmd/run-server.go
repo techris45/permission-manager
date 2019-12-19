@@ -4,10 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/sighupio/permission-manager/internal/adapters/kubeclient"
-	"github.com/sighupio/permission-manager/internal/app/user"
-	"github.com/sighupio/permission-manager/internal/config"
-	"github.com/sighupio/permission-manager/internal/server"
+	kubernetesResourcesService "github.com/sighupio/permission-manager/internal/app/kubernetes-resource"
 )
 
 func main() {
@@ -28,7 +25,7 @@ func main() {
 	}
 
 	kc := kubeclient.New()
-	userService := user.NewUserService(kc)
-	s := server.New(kc, cfg, userService)
+	ks := kubernetesResourcesService.NewKubernetesResourcesService(kc)
+	s := server.New(kc, cfg, ks)
 	s.Logger.Fatal(s.Start(":4000"))
 }

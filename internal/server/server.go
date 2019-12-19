@@ -31,7 +31,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
-func New(kubeclient kubernetes.Interface, cfg *config.Config, userService user.UserService) *echo.Echo {
+func New(kubeclient kubernetes.Interface, cfg *config.Config, k8sResources kubernetesResourcesService.kubernetesResourcesService) *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -49,12 +49,12 @@ func New(kubeclient kubernetes.Interface, cfg *config.Config, userService user.U
 
 	api := e.Group("/api")
 
-	api.GET("/list-users", listUsers(userService))
+	api.GET("/list-users", listUsers(k8sResources))
 	api.GET("/list-namespace", ListNamespaces)
 	api.GET("/rbac", ListRbac)
 
 	api.POST("/create-cluster-role", CreateClusterRole)
-	api.POST("/create-user", createUser(userService))
+	api.POST("/create-user", createUser(k8sResources))
 	api.POST("/create-rolebinding", CreateRolebinding)
 	api.POST("/create-cluster-rolebinding", createClusterRolebinding)
 
@@ -62,6 +62,7 @@ func New(kubeclient kubernetes.Interface, cfg *config.Config, userService user.U
 	api.POST("/delete-cluster-rolebinding", deleteClusterRolebinding)
 	api.POST("/delete-rolebinding", deleteRolebinding)
 	api.POST("/delete-role", deleteRole)
+	api.POST("/delete-user", deleteUser(k8sResources))
 
 	api.POST("/create-kubeconfig", createKubeconfig(cfg.ClusterName, cfg.ClusterControlPlaceAddress))
 
