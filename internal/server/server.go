@@ -31,7 +31,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
-func New(kubeclient kubernetes.Interface, cfg *config.Config) *echo.Echo {
+func New(kubeclient kubernetes.Interface, cfg *config.Config, userService user.UserService) *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -49,7 +49,7 @@ func New(kubeclient kubernetes.Interface, cfg *config.Config) *echo.Echo {
 
 	api := e.Group("/api")
 
-	api.GET("/list-users", listUsers)
+	api.GET("/list-users", listUsers(userService))
 	api.GET("/list-groups", listGroups)
 	api.GET("/list-namespace", ListNamespaces)
 	api.GET("/rbac", ListRbac)

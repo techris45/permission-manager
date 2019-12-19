@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/sighupio/permission-manager/internal/adapters/kubeclient"
+	"github.com/sighupio/permission-manager/internal/app/user"
 	"github.com/sighupio/permission-manager/internal/config"
 	"github.com/sighupio/permission-manager/internal/server"
 )
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	kc := kubeclient.New()
-	s := server.New(kc, cfg)
+	userService := user.NewUserService(kc)
+	s := server.New(kc, cfg, userService)
 	s.Logger.Fatal(s.Start(":4000"))
 }

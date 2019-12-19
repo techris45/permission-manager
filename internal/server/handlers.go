@@ -14,9 +14,14 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func listUsers(c echo.Context) error {
-	ac := c.(*AppContext)
-	return c.JSON(http.StatusOK, users.GetAll(ac.Kubeclient))
+func listUsers(us user.UserService) echo.HandlerFunc {
+	type response = []user.User
+	return func (c echo.Context) error {
+		users := us.GetAll()
+		ac := c.(*AppContext)
+		var r response = users
+		return c.JSON(http.StatusOK, r)
+	}
 }
 
 func createUser(c echo.Context) error {
