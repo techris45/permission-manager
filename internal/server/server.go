@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/middleware"
 
 	"github.com/rakyll/statik/fs"
+	"github.com/sighupio/permission-manager/internal/config"
 	_ "github.com/sighupio/permission-manager/statik"
 	"k8s.io/client-go/kubernetes"
 )
@@ -30,7 +31,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
-func New(kubeclient kubernetes.Interface) *echo.Echo {
+func New(kubeclient kubernetes.Interface, cfg *config.Config) *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -63,7 +64,7 @@ func New(kubeclient kubernetes.Interface) *echo.Echo {
 	api.POST("/delete-rolebinding", deleteRolebinding)
 	api.POST("/delete-role", deleteRole)
 
-	api.POST("/create-kubeconfig", createKubeconfig)
+	api.POST("/create-kubeconfig", createKubeconfig(cfg.ClusterName, cfg.ClusterControlPlaceAddress))
 
 	statikFS, err := fs.New()
 	if err != nil {
@@ -71,7 +72,7 @@ func New(kubeclient kubernetes.Interface) *echo.Echo {
 	}
 
 	spaHandler := http.FileServer(statikFS)
-	e.Any("*", echo.WrapHandler(AddFallbackHandler(spaHandler.ServeHTTP, "/index.html")))
+	e.Any("*", echo.WrapHandler(AddFallbackHandler(spaHandler.ServeHTTP, statikFS)))
 
 	return e
 }

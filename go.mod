@@ -4,7 +4,6 @@ go 1.12
 
 require (
 	github.com/avast/retry-go v2.4.2+incompatible
-	github.com/davecgh/go-spew v1.1.1
 	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.30.0+incompatible
 	github.com/julesguesnon/gomon v0.0.0-20190326114326-f7608dfb7114 // indirect
@@ -12,11 +11,13 @@ require (
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/rakyll/statik v0.1.6
+	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.4.0
 	github.com/valyala/fasttemplate v1.1.0 // indirect
 	github.com/vektra/mockery v0.0.0-20181123154057-e78b021dcbb5 // indirect
 	golang.org/x/sys v0.0.0-20191029155521-f43be2a4598c // indirect
-	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1
+	gopkg.in/yaml.v2 v2.2.7 // indirect
 	k8s.io/api v0.0.0-20190620084959-7cf5895f2711
 	k8s.io/apimachinery v0.0.0-20190612205821-1799e75a0719
 	k8s.io/client-go v0.0.0-20190620085101-78d2af792bab

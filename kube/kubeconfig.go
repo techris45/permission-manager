@@ -3,7 +3,6 @@ package kube
 import (
 	"encoding/base64"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -13,20 +12,8 @@ import (
 
 var clusterName, clusterControlPlaceAddress string
 
-func init() {
-	clusterName = os.Getenv("CLUSTER_NAME")
-	if clusterName == "" {
-		log.Fatal("CLUSTER_NAME env cannot be empty")
-	}
-
-	clusterControlPlaceAddress = os.Getenv("CONTROL_PLANE_ADDRESS")
-	if clusterControlPlaceAddress == "" {
-		log.Fatal("CONTROL_PLANE_ADDRESS env cannot be empty")
-	}
-}
-
 // CreateKubeconfigYAML returns a kubeconfig YAML string
-func CreateKubeconfigYAML(kc kubernetes.Interface, username string) (kubeconfigYAML string) {
+func CreateKubeconfigYAML(kc kubernetes.Interface, clusterName, clusterControlPlaceAddress, username string) (kubeconfigYAML string) {
 	priv, privPem := createRsaPrivateKeyPem()
 	certificatePemBytes := getSignedCertificateForUser(kc, username, priv)
 

@@ -1,10 +1,13 @@
 package server
 
 import (
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/sighupio/permission-manager/kube"
+	createKubeconfigUsecase "github.com/sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
 	"github.com/sighupio/permission-manager/resources"
 	"github.com/sighupio/permission-manager/users"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -279,23 +282,25 @@ func deleteRolebinding(c echo.Context) error {
 	return c.JSON(http.StatusOK, Response{Ok: true})
 }
 
-func createKubeconfig(c echo.Context) error {
-	ac := c.(*AppContext)
+func createKubeconfig(clusterName, clusterControlPlaceAddress string) echo.HandlerFunc {
 	type Request struct {
 		Username string `json:"username"`
 	}
-	r := new(Request)
-	if err := c.Bind(r); err != nil {
-		return err
-	}
-
-	kubeconfig := kube.CreateKubeconfigYAML(ac.Kubeclient, r.Username)
-
 	type Response struct {
 		Ok         bool   `json:"ok"`
 		Kubeconfig string `json:"kubeconfig"`
 	}
-	return c.JSON(http.StatusOK, Response{Ok: true, Kubeconfig: kubeconfig})
+	return func(c echo.Context) error {
+		ac := c.(*AppContext)
+		r := new(Request)
+		if err := c.Bind(r); err != nil {
+			return err
+		}
+
+		kubeconfig := createKubeconfigUsecase.CreateKubeconfigYAMLForUser(ac.Kubeclient, clusterName, clusterControlPlaceAddress, r.Username)
+
+		return c.JSON(http.StatusOK, Response{Ok: true, Kubeconfig: kubeconfig})
+	}
 }
 
 type (
@@ -330,8 +335,7 @@ func (frw *FallbackResponseWriter) WriteHeader(statusCode int) {
 	frw.WrappedResponseWriter.WriteHeader(statusCode)
 }
 
-// AddFallbackHandler wraps the handler func in another handler func covering authentication
-func AddFallbackHandler(handler http.HandlerFunc, filename string) http.HandlerFunc {
+func AddFallbackHandler(handler http.HandlerFunc, fs http.FileSystem) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		frw := FallbackResponseWriter{
 			WrappedResponseWriter: w,
@@ -339,7 +343,18 @@ func AddFallbackHandler(handler http.HandlerFunc, filename string) http.HandlerF
 		}
 		handler(&frw, r)
 		if frw.FileNotFound {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			f, err := fs.Open("/index.html")
+			if err != nil {
+				log.Fatal("Failed to open index.html")
+			}
+			defer f.Close()
+			content, err := ioutil.ReadAll(f)
+			if err != nil {
+				log.Fatal("Failed to read index.html")
+			}
+
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			fmt.Fprint(w, string(content))
 		}
 	}
 }
