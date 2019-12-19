@@ -50,12 +50,11 @@ func New(kubeclient kubernetes.Interface, cfg *config.Config, userService user.U
 	api := e.Group("/api")
 
 	api.GET("/list-users", listUsers(userService))
-	api.GET("/list-groups", listGroups)
 	api.GET("/list-namespace", ListNamespaces)
 	api.GET("/rbac", ListRbac)
 
 	api.POST("/create-cluster-role", CreateClusterRole)
-	api.POST("/create-user", createUser)
+	api.POST("/create-user", createUser(userService))
 	api.POST("/create-rolebinding", CreateRolebinding)
 	api.POST("/create-cluster-rolebinding", createClusterRolebinding)
 

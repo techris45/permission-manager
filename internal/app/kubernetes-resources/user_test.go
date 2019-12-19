@@ -1,4 +1,4 @@
-package user
+package kubernetesresources
 
 import (
 	"testing"

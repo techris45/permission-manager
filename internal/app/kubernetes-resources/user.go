@@ -1,38 +1,25 @@
-package user
+package kubernetesresources
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
-
-	"k8s.io/client-go/kubernetes"
 )
 
-// User is a yser saved inside ETCD as a Custom Resouce (CRD api)
 type User struct {
 	Name string `json:"name"`
 }
 
 type UserService interface {
-	GetAll() []User
+	GetAllUsers() []User
 	DeleteUser(username string) User
 	CreateUser(username string) User
 }
 
-const resourceUrl = "apis/permissionmanager.user/v1alpha1/permissionmanagerusers"
+const resourceURL = "apis/permissionmanager.user/v1alpha1/permissionmanagerusers"
 
-type userService struct {
-	kubeclient kubernetes.Interface
-}
-
-func NewUserService(kc kubernetes.Interface) UserService {
-	return &userService{
-		kubeclient: kc,
-	}
-}
-
-func (u *userService) GetAll() []User {
+func (k *kubernetesResourcesService) GetAllUsers() []User {
 	users := []User{}
 
 	/* generated from JSON response, most fields not used but usefull as documentation */
@@ -65,7 +52,7 @@ func (u *userService) GetAll() []User {
 	}
 
 	var res resType
-	r, err := u.kubeclient.AppsV1().RESTClient().Get().AbsPath(resourceUrl).DoRaw()
+	r, err := k.kubeclient.AppsV1().RESTClient().Get().AbsPath(resourceURL).DoRaw()
 	if err != nil {
 		log.Print("Failed to get users from k8s CRUD api", err)
 	}
@@ -81,7 +68,7 @@ func (u *userService) GetAll() []User {
 	return users
 }
 
-func (u *userService) CreateUser(username string) User {
+func (k *kubernetesResourcesService) CreateUser(username string) User {
 	metadataName := "permissionmanager.user." + username
 	jsonPayload := fmt.Sprintf(`{
 		"apiVersion":"permissionmanager.user/v1alpha1",
@@ -94,7 +81,7 @@ func (u *userService) CreateUser(username string) User {
 		}
 	}`, metadataName, username)
 
-	_, err := u.kubeclient.AppsV1().RESTClient().Post().AbsPath(resourceUrl).Body([]byte(jsonPayload)).DoRaw()
+	_, err := k.kubeclient.AppsV1().RESTClient().Post().AbsPath(resourceURL).Body([]byte(jsonPayload)).DoRaw()
 	if err != nil {
 		log.Printf("Failed to create user:%s\n %v\n", username, err)
 	}
@@ -102,12 +89,10 @@ func (u *userService) CreateUser(username string) User {
 	return User{Name: username}
 }
 
-func (u *userService) DeleteUser(username string) User {
+func (k *kubernetesResourcesService) DeleteUser(username string) {
 	metadataName := "permissionmanager.user." + username
-	_, err := u.kubeclient.AppsV1().RESTClient().Delete().AbsPath(resourceUrl + "/" + metadataName).DoRaw()
+	_, err := k.kubeclient.AppsV1().RESTClient().Delete().AbsPath(resourceURL + "/" + metadataName).DoRaw()
 	if err != nil {
 		log.Printf("Failed to delete user:%s\n %v\n", username, err)
 	}
-
-	return User{Name: username}
 }

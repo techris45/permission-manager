@@ -7,60 +7,51 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
+	kubernetesresources "github.com/sighupio/permission-manager/internal/app/kubernetes-resources"
 	createKubeconfigUsecase "github.com/sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
-	"github.com/sighupio/permission-manager/resources"
-	"github.com/sighupio/permission-manager/users"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func listUsers(us user.UserService) echo.HandlerFunc {
-	type response = []user.User
-	return func (c echo.Context) error {
-		users := us.GetAll()
-		ac := c.(*AppContext)
+func listUsers(us kubernetesresources.UserService) echo.HandlerFunc {
+	type response = []kubernetesresources.User
+	return func(c echo.Context) error {
+		users := us.GetAllUsers()
 		var r response = users
 		return c.JSON(http.StatusOK, r)
 	}
 }
+func createUser(us kubernetesresources.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		type request struct {
+			Name string `json:"name" validate:"required"`
+		}
+		type reponse = kubernetesresources.User
+		r := new(request)
+		if err := c.Bind(r); err != nil {
+			panic(err)
+		}
+		if err := c.Validate(r); err != nil {
+			return c.JSON(http.StatusBadRequest, ErrorRes{err.Error()})
+		}
 
-func createUser(c echo.Context) error {
-	ac := c.(*AppContext)
-	type Request struct {
-		Name string `json:"name" validate:"required"`
-	}
-	type Reponse = users.User
-	r := new(Request)
-	if err := c.Bind(r); err != nil {
-		panic(err)
-	}
-	if err := c.Validate(r); err != nil {
-		return c.JSON(http.StatusBadRequest, ErrorRes{err.Error()})
-	}
+		u := us.CreateUser(r.Name)
 
-	u := users.CreateUser(ac.Kubeclient, r.Name)
-
-	return c.JSON(http.StatusOK, Reponse{Name: u.Name})
+		return c.JSON(http.StatusOK, reponse{Name: u.Name})
+	}
 }
 
-func listGroups(c echo.Context) error {
-	type Group struct {
-		Name string `json:"name"`
+func ListNamespaces(us kubernetesresources.KubernetesResourcesService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		type Response struct {
+			Namespaces []string `json:"namespaces"`
+		}
+
+		names, _ := us.GetNamespaces()
+		return c.JSON(http.StatusOK, Response{
+			Namespaces: names,
+		})
 	}
-	return c.JSON(http.StatusOK, []Group{})
-}
-
-func ListNamespaces(c echo.Context) error {
-	ac := c.(*AppContext)
-
-	type Response struct {
-		Namespaces []string `json:"namespaces"`
-	}
-
-	names, _ := resources.GetNamespaces(ac.Kubeclient)
-	return c.JSON(http.StatusOK, Response{
-		Namespaces: names,
-	})
 }
 
 func ListRbac(c echo.Context) error {

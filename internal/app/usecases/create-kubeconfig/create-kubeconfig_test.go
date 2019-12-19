@@ -3,7 +3,7 @@ package createkubeconfigusecase
 import (
 	"testing"
 
-	"gopkg.in/go-playground/assert.v1"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateKubeconfig(t *testing.T) {
@@ -30,5 +30,5 @@ users:
 		client-certificate-data: CERTIFICATE_BASE64
 		  client-key-data: PRIVATE_KEY_BASE64`
 
-	assert.Equal(t, got, want)
+	assert.Equal(t, want, got)
 }
