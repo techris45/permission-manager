@@ -1,10 +1,10 @@
-package kubernetesresources
+package resources
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (k *kubernetesResourcesService) GetNamespaces() (names []string, err error) {
+func (r *resourcesService) GetNamespaces() (names []string, err error) {
 	namespaces, err := k.kubeclient.CoreV1().Namespaces().List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err

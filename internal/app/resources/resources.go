@@ -1,4 +1,4 @@
-package kubernetesresources
+package resources
 
 import (
 	"k8s.io/client-go/kubernetes"
@@ -6,16 +6,16 @@ import (
 
 // User is a yser saved inside ETCD as a Custom Resouce (CRD api)
 
-type KubernetesResourcesService interface {
+type ResourcesService interface {
 	UserService
 	GetNamespaces() (names []string, err error)
 }
 
-type kubernetesResourcesService struct {
+type resourcesService struct {
 	kubeclient kubernetes.Interface
 }
 
-func NewKubernetesResourcesService(kc kubernetes.Interface) KubernetesResourcesService {
+func NewResourcesService(kc kubernetes.Interface) ResourcesService {
 	return &kubernetesResourcesService{
 		kubeclient: kc,
 	}

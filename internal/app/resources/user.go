@@ -1,4 +1,4 @@
-package kubernetesresources
+package resources
 
 import (
 	"encoding/json"
@@ -19,7 +19,7 @@ type UserService interface {
 
 const resourceURL = "apis/permissionmanager.user/v1alpha1/permissionmanagerusers"
 
-func (k *kubernetesResourcesService) GetAllUsers() []User {
+func (r *resourcesService) GetAllUsers() []User {
 	users := []User{}
 
 	/* generated from JSON response, most fields not used but usefull as documentation */
@@ -52,7 +52,7 @@ func (k *kubernetesResourcesService) GetAllUsers() []User {
 	}
 
 	var res resType
-	r, err := k.kubeclient.AppsV1().RESTClient().Get().AbsPath(resourceURL).DoRaw()
+	r, err := r.kubeclient.AppsV1().RESTClient().Get().AbsPath(resourceURL).DoRaw()
 	if err != nil {
 		log.Print("Failed to get users from k8s CRUD api", err)
 	}
@@ -68,7 +68,7 @@ func (k *kubernetesResourcesService) GetAllUsers() []User {
 	return users
 }
 
-func (k *kubernetesResourcesService) CreateUser(username string) User {
+func (r *resourcesService) CreateUser(username string) User {
 	metadataName := "permissionmanager.user." + username
 	jsonPayload := fmt.Sprintf(`{
 		"apiVersion":"permissionmanager.user/v1alpha1",
@@ -81,7 +81,7 @@ func (k *kubernetesResourcesService) CreateUser(username string) User {
 		}
 	}`, metadataName, username)
 
-	_, err := k.kubeclient.AppsV1().RESTClient().Post().AbsPath(resourceURL).Body([]byte(jsonPayload)).DoRaw()
+	_, err := r.kubeclient.AppsV1().RESTClient().Post().AbsPath(resourceURL).Body([]byte(jsonPayload)).DoRaw()
 	if err != nil {
 		log.Printf("Failed to create user:%s\n %v\n", username, err)
 	}
@@ -89,9 +89,9 @@ func (k *kubernetesResourcesService) CreateUser(username string) User {
 	return User{Name: username}
 }
 
-func (k *kubernetesResourcesService) DeleteUser(username string) {
+func (r *resourcesService) DeleteUser(username string) {
 	metadataName := "permissionmanager.user." + username
-	_, err := k.kubeclient.AppsV1().RESTClient().Delete().AbsPath(resourceURL + "/" + metadataName).DoRaw()
+	_, err := r.kubeclient.AppsV1().RESTClient().Delete().AbsPath(resourceURL + "/" + metadataName).DoRaw()
 	if err != nil {
 		log.Printf("Failed to delete user:%s\n %v\n", username, err)
 	}
