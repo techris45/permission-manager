@@ -1,6 +1,10 @@
 package server
 
-import "regexp"
+import (
+	"regexp"
+
+	"github.com/go-playground/validator"
+)
 
 const validUsernameRegex = "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
 
@@ -9,4 +13,13 @@ var invalidUsernameError = `username must be DNS-1123 compliant, it must consist
 func isValidUsername(username string) (valid bool) {
 	re := regexp.MustCompile(validUsernameRegex)
 	return re.MatchString(username)
+}
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+
 }

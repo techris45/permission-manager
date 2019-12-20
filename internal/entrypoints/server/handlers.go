@@ -13,6 +13,10 @@ import (
 	createKubeconfigUsecase "sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
 )
 
+type ErrorRes struct {
+	Error string `json:"error"`
+}
+
 func listUsers(us resources.UserService) echo.HandlerFunc {
 	type response = []resources.User
 	return func(c echo.Context) error {

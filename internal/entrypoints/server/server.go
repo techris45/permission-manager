@@ -20,18 +20,6 @@ type AppContext struct {
 	Kubeclient kubernetes.Interface
 }
 
-type CustomValidator struct {
-	validator *validator.Validate
-}
-
-type ErrorRes struct {
-	Error string `json:"error"`
-}
-
-func (cv *CustomValidator) Validate(i interface{}) error {
-	return cv.validator.Struct(i)
-}
-
 func New(kubeclient kubernetes.Interface, cfg *config.Config, resourcesService resources.ResourcesService) *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
