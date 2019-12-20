@@ -7,10 +7,10 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	createKubeconfigUsecase "sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
-	"sighupio/permission-manager/internal/app/resources"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sighupio/permission-manager/internal/app/resources"
+	createKubeconfigUsecase "sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
 )
 
 func listUsers(us resources.UserService) echo.HandlerFunc {
@@ -34,23 +34,25 @@ func createUser(us resources.UserService) echo.HandlerFunc {
 		if err := c.Validate(r); err != nil {
 			return c.JSON(http.StatusBadRequest, ErrorRes{err.Error()})
 		}
+		if !isValidUsername(r.Name) {
+			return c.JSON(http.StatusBadRequest, ErrorRes{invalidUsernameError})
+		}
 
 		u := us.CreateUser(r.Name)
-
 		return c.JSON(http.StatusOK, reponse{Name: u.Name})
 	}
 }
 
-func deleteUser(us resources.UserService) echo.HandlerFunc{
-	return func (c echo.Context) error {
-	
+func deleteUser(us resources.UserService) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
 		type Request struct {
 			Username string `json:"username" validate:"required"`
 		}
 		type Response struct {
 			Ok bool `json:"ok"`
 		}
-	
+
 		r := new(Request)
 		if err := c.Bind(r); err != nil {
 			return err
@@ -58,7 +60,7 @@ func deleteUser(us resources.UserService) echo.HandlerFunc{
 		if err := c.Validate(r); err != nil {
 			return c.JSON(http.StatusBadRequest, ErrorRes{err.Error()})
 		}
-	
+
 		us.DeleteUser(r.Username)
 		return c.JSON(http.StatusOK, Response{Ok: true})
 	}

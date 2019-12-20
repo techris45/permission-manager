@@ -7,7 +7,7 @@ import (
 	"sighupio/permission-manager/internal/adapters/kubeclient"
 	"sighupio/permission-manager/internal/app/resources"
 	"sighupio/permission-manager/internal/config"
-	server "sighupio/permission-manager/internal/entrypoints/http"
+	"sighupio/permission-manager/internal/entrypoints/server"
 )
 
 func main() {
