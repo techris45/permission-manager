@@ -13,7 +13,7 @@ type User struct {
 
 type UserService interface {
 	GetAllUsers() []User
-	DeleteUser(username string) User
+	DeleteUser(username string)
 	CreateUser(username string) User
 }
 
@@ -52,11 +52,11 @@ func (r *resourcesService) GetAllUsers() []User {
 	}
 
 	var res resType
-	r, err := r.kubeclient.AppsV1().RESTClient().Get().AbsPath(resourceURL).DoRaw()
+	rawResponse, err := r.kubeclient.AppsV1().RESTClient().Get().AbsPath(resourceURL).DoRaw()
 	if err != nil {
 		log.Print("Failed to get users from k8s CRUD api", err)
 	}
-	err = json.Unmarshal(r, &res)
+	err = json.Unmarshal(rawResponse, &res)
 	if err != nil {
 		log.Print("Failed to decode users from k8s CRUD api", err)
 	}

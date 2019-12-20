@@ -5,7 +5,7 @@ import (
 )
 
 func (r *resourcesService) GetNamespaces() (names []string, err error) {
-	namespaces, err := k.kubeclient.CoreV1().Namespaces().List(metav1.ListOptions{})
+	namespaces, err := r.kubeclient.CoreV1().Namespaces().List(metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}

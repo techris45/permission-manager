@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/sighupio/permission-manager/internal/adapters/kubeclient"
-	"github.com/sighupio/permission-manager/internal/app/resources"
-	"github.com/sighupio/permission-manager/internal/config"
-	server "github.com/sighupio/permission-manager/internal/entrypoints/http"
+	"sighupio/permission-manager/internal/adapters/kubeclient"
+	"sighupio/permission-manager/internal/app/resources"
+	"sighupio/permission-manager/internal/config"
+	server "sighupio/permission-manager/internal/entrypoints/http"
 )
 
 func main() {

@@ -7,26 +7,26 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	kubernetesresources "github.com/sighupio/permission-manager/internal/app/kubernetes-resources"
-	createKubeconfigUsecase "github.com/sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
+	createKubeconfigUsecase "sighupio/permission-manager/internal/app/usecases/create-kubeconfig"
+	"sighupio/permission-manager/internal/app/resources"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func listUsers(us kubernetesresources.UserService) echo.HandlerFunc {
-	type response = []kubernetesresources.User
+func listUsers(us resources.UserService) echo.HandlerFunc {
+	type response = []resources.User
 	return func(c echo.Context) error {
 		users := us.GetAllUsers()
 		var r response = users
 		return c.JSON(http.StatusOK, r)
 	}
 }
-func createUser(us kubernetesresources.UserService) echo.HandlerFunc {
+func createUser(us resources.UserService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		type request struct {
 			Name string `json:"name" validate:"required"`
 		}
-		type reponse = kubernetesresources.User
+		type reponse = resources.User
 		r := new(request)
 		if err := c.Bind(r); err != nil {
 			panic(err)
@@ -41,7 +41,7 @@ func createUser(us kubernetesresources.UserService) echo.HandlerFunc {
 	}
 }
 
-func deleteUser(us kubernetesresources.UserService) echo.HandlerFunc{
+func deleteUser(us resources.UserService) echo.HandlerFunc{
 	return func (c echo.Context) error {
 	
 		type Request struct {
@@ -64,13 +64,13 @@ func deleteUser(us kubernetesresources.UserService) echo.HandlerFunc{
 	}
 }
 
-func ListNamespaces(kr kubernetesresources.KubernetesResourcesService) echo.HandlerFunc {
+func ListNamespaces(rs resources.ResourcesService) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		type Response struct {
 			Namespaces []string `json:"namespaces"`
 		}
 
-		names, _ := us.GetNamespaces()
+		names, _ := rs.GetNamespaces()
 		return c.JSON(http.StatusOK, Response{
 			Namespaces: names,
 		})

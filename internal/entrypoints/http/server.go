@@ -8,9 +8,10 @@ import (
 	"github.com/labstack/echo/middleware"
 
 	"github.com/rakyll/statik/fs"
-	"github.com/sighupio/permission-manager/internal/config"
-	_ "github.com/sighupio/permission-manager/statik"
 	"k8s.io/client-go/kubernetes"
+	"sighupio/permission-manager/internal/app/resources"
+	"sighupio/permission-manager/internal/config"
+	_ "sighupio/permission-manager/statik"
 )
 
 // AppContext echo context extended with application specific fields
@@ -31,7 +32,7 @@ func (cv *CustomValidator) Validate(i interface{}) error {
 	return cv.validator.Struct(i)
 }
 
-func New(kubeclient kubernetes.Interface, cfg *config.Config, k8sResources kubernetesResourcesService.kubernetesResourcesService) *echo.Echo {
+func New(kubeclient kubernetes.Interface, cfg *config.Config, resourcesService resources.ResourcesService) *echo.Echo {
 	e := echo.New()
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -49,12 +50,12 @@ func New(kubeclient kubernetes.Interface, cfg *config.Config, k8sResources kuber
 
 	api := e.Group("/api")
 
-	api.GET("/list-users", listUsers(k8sResources))
-	api.GET("/list-namespace", ListNamespaces)
+	api.GET("/list-users", listUsers(resourcesService))
+	api.GET("/list-namespace", ListNamespaces(resourcesService))
 	api.GET("/rbac", ListRbac)
 
 	api.POST("/create-cluster-role", CreateClusterRole)
-	api.POST("/create-user", createUser(k8sResources))
+	api.POST("/create-user", createUser(resourcesService))
 	api.POST("/create-rolebinding", CreateRolebinding)
 	api.POST("/create-cluster-rolebinding", createClusterRolebinding)
 
@@ -62,7 +63,7 @@ func New(kubeclient kubernetes.Interface, cfg *config.Config, k8sResources kuber
 	api.POST("/delete-cluster-rolebinding", deleteClusterRolebinding)
 	api.POST("/delete-rolebinding", deleteRolebinding)
 	api.POST("/delete-role", deleteRole)
-	api.POST("/delete-user", deleteUser(k8sResources))
+	api.POST("/delete-user", deleteUser(resourcesService))
 
 	api.POST("/create-kubeconfig", createKubeconfig(cfg.ClusterName, cfg.ClusterControlPlaceAddress))
 

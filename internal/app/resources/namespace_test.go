@@ -1,16 +1,15 @@
-package kubernetesresources_test
+package resources
 
 import (
 	"testing"
 
-	"github.com/sighupio/permission-manager/internal/app/resources"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/kubernetes/fake"
 )
 
 func TestGetNamespaces(t *testing.T) {
 	kc := fake.NewSimpleClientset()
-	svc := resources.NewResourcesService(kc)
+	svc := NewResourcesService(kc)
 
 	names, err := svc.GetNamespaces()
 	got := names
