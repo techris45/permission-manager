@@ -25,7 +25,5 @@ export function useNamespaceList() {
     }
   }, [])
 
-  console.log(namespaceList)
-
   return { namespaceList }
 }
