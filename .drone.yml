@@ -1,0 +1,38 @@
+---
+kind: pipeline
+name: release
+
+platform:
+  os: linux
+  arch: amd64
+
+volumes:
+- name: shared
+  temp: {}
+
+steps:
+  - name: build-binary
+    image: golang:1.13.5
+    pull: always
+    volumes:
+    - name: shared
+      path: /app
+    commands:
+      - apt-get update && apt-get install -y npm
+      - make init build
+      - mv permission-manager /app/permission-manager
+    when:
+      event:
+      - push
+
+  - name: build-container-image
+    image: docker:dind
+    pull: always
+    commands:
+      - ls -lrt /app
+    volumes:
+      - name: shared
+        path: /app
+    when:
+      event:
+      - push

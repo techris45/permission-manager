@@ -4,16 +4,25 @@ clean:
 	rm -rf ./web-client/build
 	rm -rf ./web-client/node_modules
 
-go-build:
+dependencies:
 	go mod download
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o permission-manager ./cmd/run-server.go
+	go get github.com/rakyll/statik
+	npm install --prefix ./web-client
+
+init: clean dependencies
 
 ui-build:
-	npm install --prefix ./web-client
 	npm run build --prefix ./web-client
 	statik -src=./web-client/build
 
-build: ui-build go-build
+go-build:
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o permission-manager ./cmd/run-server.go
+
+build: dependencies ui-build go-build
+
+release-image: build
+	docker build -t quay.io/sighup/permission-manager:$${VERSION:-local} .
+	# docker push quay.io/sighup/permission-manager:$${VERSION:-local}
 
 run: build
 	./permission-manager
@@ -24,10 +33,5 @@ dev:
 delete-users:
 	kubectl delete -f ./crd/user-crd-definition.yml && kubectl apply -f ./crd/user-crd-definition.yml
 
-release-image:
-	docker build -t reg.sighup.io/sighup-products/permission-manager:1.0.0 .
-	docker push reg.sighup.io/sighup-products/permission-manager:1.0.0
-
 forward-service:
 	kubectl port-forward svc/permission-manager-service 4000 --namespace permission-manager
-
