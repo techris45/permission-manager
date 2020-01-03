@@ -1,5 +1,28 @@
 ---
 kind: pipeline
+name: tests
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+  - name: go-tests
+    image: golang:1.13.5
+    pull: always
+    volumes:
+    - name: shared
+      path: /app
+    commands:
+      - apt-get update && apt-get install -y npm
+      - make init ui-build
+      - go test -v ./...
+    when:
+      event:
+      - push
+
+---
+kind: pipeline
 name: release
 
 platform:
