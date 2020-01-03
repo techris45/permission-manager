@@ -2,6 +2,12 @@
 
 Permission manager is an application that allow to a user specific kubeconfig, and assign permissions to operate within a namespace or globally via a web interface
 
+## Compatibility
+
+| App Version / Kubernetes Version | 1.14.X             | 1.15.X             | 1.16.X             |
+|----------------------------------|:------------------:|:------------------:|:------------------:|
+| v1.0.0                           |                    |                    |                    |
+
 ## Quick core concepts
 
 - A server written in go is responsive to talk with the k8s cluster
